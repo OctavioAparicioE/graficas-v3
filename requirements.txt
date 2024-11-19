@@ -1,0 +1,6 @@
+fastapi
+uvicorn
+pyodbc
+pandas
+numpy
+jinja2

@@ -1,0 +1,148 @@
+-- BASE DE DATOS FINAL CAMARA_ANECOICA-V2
+-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+DROP DATABASE IF EXISTS camara_anecoica;
+
+CREATE DATABASE camara_anecoica;
+USE camara_anecoica;
+
+-- Tabla de Usuarios
+CREATE TABLE usuarios (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL
+);
+
+-- Tabla de Variables de Antena
+CREATE TABLE IF NOT EXISTS variables_antena (
+    id_variables INT AUTO_INCREMENT,
+    ganancia FLOAT,
+    polarizacion VARCHAR(50),
+    tiempo_medicion VARCHAR(50),
+    PRIMARY KEY (id_variables)
+);
+
+-- Tabla de Recorrido de la Medición
+CREATE TABLE IF NOT EXISTS start_stop (
+    id_start_stop INT AUTO_INCREMENT,
+    scan_start FLOAT,
+    scan_stop FLOAT,
+    step_start FLOAT,
+    step_stop FLOAT,
+    total_scan FLOAT,
+    total_step FLOAT,
+    point_scan FLOAT,
+    point_step FLOAT,
+    PRIMARY KEY (id_start_stop)
+);
+
+-- Tabla de Mediciones
+CREATE TABLE IF NOT EXISTS mediciones (
+    id_medicion INT AUTO_INCREMENT PRIMARY KEY,
+    identificador VARCHAR(255) UNIQUE
+);
+
+
+-- Tabla de Frecuencias asociada a cada Medición
+CREATE TABLE IF NOT EXISTS frecuencias (
+    id_frecuencia INT AUTO_INCREMENT PRIMARY KEY,
+    id_medicion INT,
+    frecuencia FLOAT,
+    FOREIGN KEY (id_medicion) REFERENCES mediciones(id_medicion)
+);
+
+-- Tabla de Puntos de Medición 
+CREATE TABLE IF NOT EXISTS puntos_medicion (
+    id_puntos_medicion INT AUTO_INCREMENT PRIMARY KEY,
+    id_medicion INT,
+    id_start_stop INT,  
+    scan INT,
+    rinc INT,
+    frecuencia INT,
+    amplitud1 FLOAT,
+    fase1 FLOAT,
+    amplitud2 FLOAT,
+    fase2 FLOAT,
+    amplitud3 FLOAT,
+    fase3 FLOAT,
+    amplitud4 FLOAT,
+    fase4 FLOAT,
+    amplitud5 FLOAT,
+    fase5 FLOAT,
+    amplitud6 FLOAT,
+    fase6 FLOAT,
+    FOREIGN KEY (id_medicion) REFERENCES mediciones(id_medicion),
+    FOREIGN KEY (id_start_stop) REFERENCES start_stop(id_start_stop) 
+);
+
+
+-- Tabla Principal de Datos de la Medición
+CREATE TABLE IF NOT EXISTS datos_medicion_principal (
+    id_datos_medicion INT AUTO_INCREMENT,
+    fecha_hora DATETIME,
+    responsable_medicion VARCHAR(50),
+    id_variables INT,
+    identificador VARCHAR(255), 
+    id_start_stop INT,
+    PRIMARY KEY (id_datos_medicion),
+    FOREIGN KEY (identificador) REFERENCES mediciones(identificador),
+    FOREIGN KEY (id_variables) REFERENCES variables_antena(id_variables),
+    FOREIGN KEY (id_start_stop) REFERENCES start_stop(id_start_stop)
+);
+
+-- Insertar un usuario de ejemplo
+INSERT INTO usuarios (id, username, password) VALUES (1, 'admin', '123');
+
+
+
+
+##################################################################################
+
+use camara_anecoica;
+
+select * from datos_medicion_principal;
+select * from frecuencias;
+select * from mediciones;
+select * from start_stop;
+select * from usuarios;
+select * from variables_antena;
+select * from puntos_medicion;
+
+SELECT Frecuencias.frecuencia
+FROM Frecuencias
+JOIN Mediciones ON Frecuencias.id_medicion = Mediciones.id_medicion WHERE Mediciones.identificador = '20240802_PNF_Tz200_P23_FF_FF';
+
+SELECT
+    s.scan_start,
+    s.scan_stop,
+    s.step_start,
+    s.step_stop,
+    s.point_scan,
+    s.point_step
+FROM 
+    puntos_medicion p
+JOIN 
+    mediciones m ON p.id_medicion = m.id_medicion
+JOIN 
+    start_stop s ON p.id_start_stop = s.id_start_stop
+WHERE 
+    m.identificador = '20240802_PNF_Tz200_P23_FF_FF'
+ORDER BY 
+    p.amplitud4 DESC
+LIMIT 3;
+
+
+SELECT 
+    s.scan_start,
+    s.scan_stop,
+    s.step_start,
+    s.step_stop,
+    s.point_scan,
+    s.point_step
+FROM 
+    start_stop s
+JOIN 
+    datos_medicion_principal dmp ON s.id_start_stop = dmp.id_start_stop
+WHERE 
+    dmp.identificador = '20240816_PNF_Tz200_P25_FF_FF';
+
