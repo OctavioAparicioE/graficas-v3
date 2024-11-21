@@ -1,55 +1,73 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resultados de Consulta</title>
-    <style>
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        table, th, td {
-            border: 1px solid black;
-        }
-        th, td {
-            padding: 10px;
-            text-align: left;
-        }
-    </style>
+    <title>Gráficos de Radiación</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', path='css/styles.css') }}">
 </head>
 <body>
 
-    <h1>Resultados de la Consulta</h1>
-    
-    {% if data %}
-    <table>
-        <thead>
-            <tr>
-                <th>Scan Start</th>
-                <th>Scan Stop</th>
-                <th>Step Start</th>
-                <th>Step Stop</th>
-                <th>Point Scan</th>
-                <th>Point Step</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for row in data %}
-            <tr>
-                <td>{{ row[0] }}</td>
-                <td>{{ row[1] }}</td>
-                <td>{{ row[2] }}</td>
-                <td>{{ row[3] }}</td>
-                <td>{{ row[4] }}</td>
-                <td>{{ row[5] }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    {% else %}
-    <p>No se encontraron datos.</p>
-    {% endif %}
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <div id="graph1" style="width:800;height:700;"></div>
+    <script>
+        // Datos para la gráfica 3D
+        var data = [{
+            z: {{ z_values | tojson }},
+            x: {{ x_values | tojson }},
+            y: {{ y_values | tojson }},
+            type: 'surface',
+            colorscale: 'Jet',
+            colorbar: {
+                title: 'dB',
+                xpad: 10,  // Ajustar el espacio entre la barra de color y la gráfica
+                x: 1.2     // Mover la barra de color más lejos de la gráfica
+            }
+        }];
+        
+        // Configuración inicial de la gráfica
+        var layout = {
+            title: 'Patrón de Radiación',
+            scene: {
+                camera: {
+                    eye: { x: .6, y: 1, z: .3 } // Vista inicial
+                },
+                xaxis: { title: 'Scan (m)' },
+                yaxis: { title: 'Step (m)' },
+                zaxis: { title: 'Amplitud (dB)' }
+            }
+        };
 
+        // Crear la gráfica
+        Plotly.newPlot('graph1', data, layout);
+
+        // Función para rotar la gráfica automáticamente
+        var angle = 0;
+        function rotateGraph() {
+            angle += 1; // Aumentar el ángulo de rotación
+            var eye = {
+                x: -0.5 * Math.cos(angle * Math.PI / 180),
+                y: 1.5 * Math.sin(angle * Math.PI / 180),
+                z: 0.5
+            };
+            Plotly.relayout('graph1', { scene: { camera: { eye: eye } } }); // Actualizar vista
+        }
+
+        // Activar la rotación cada 50 ms
+        setInterval(rotateGraph, 50);
+    </script>
+
+    <div class="container">
+        <!-- Primer gráfico -->
+        <div class="graph-container" id="graph-container-1">
+            {{ graph_html1 | safe }}
+        </div>
+    </div>
+
+
+    <!-- Scripts -->
+    <script src="{{ url_for('static', path='js/rotate_graph.js') }}"></script>
 </body>
 </html>
+
