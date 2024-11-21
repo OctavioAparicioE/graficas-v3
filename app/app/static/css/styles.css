@@ -1,9 +1,49 @@
+/* Estilo general */
 body {
     font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-    text-align: center;
+    margin: 0;
+    padding: 0;
+    background-color: #f9f9f9;
+    color: #333;
 }
 
-h1 {
-    color: #333;
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+/* Estilo para la gráfica rotatoria */
+#graph1 {
+    width: 800px;
+    height: 700px;
+    margin: 0 auto;
+    border: 2px solid #28a745;
+    border-radius: 10px;
+    background-color: #ffffff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilo para la gráfica giratoria */
+#graph-container-1 {
+    width: 1800px;
+    height: 600px;
+    padding: 10px;
+    border: 2px solid #007bff;
+    border-radius: 10px;
+    background-color: #ffffff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+}
+
+
+
+/* Estilo para pantallas pequeñas */
+@media (max-width: 768px) {
+    #graph-container-1, #graph1 {
+        width: 100%;
+        height: auto;
+    }
 }
